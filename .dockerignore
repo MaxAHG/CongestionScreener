@@ -1,0 +1,32 @@
+# Large data files — live in Cloud Storage, not in the image
+*.duckdb
+hifld_lines.json
+hifld_territories.json
+hifld_substations.csv
+miso_constraints.geojson
+miso_constraints_map.html
+PJM 2025*.csv
+2025_da_bc_HIST*.csv
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Git
+.git/
+.gitignore
+
+# Data loader and analytics scripts (not needed at runtime)
+app.py
+load_*.py
+build_analytics*.py
+enrich_*.py
+migrate_*.py
+miso_constraint_mapper.py
+
+# Docs
+DEPLOY.md
+README.md
