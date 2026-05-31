@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# Database files (large derived artifacts — regenerate with loaders)
+*.duckdb
+
+# Raw data exports (too large / not source code)
+PJM 2025 *.csv
+2025_da_bc_HIST*.csv
+nyiso_bc*/
+nyiso_bc_jan*/
+damlbmp_jan2025/
+
+# Generated outputs
+miso_constraints_map.html
+
+# Claude Code local settings (machine-specific permissions)
+.claude/settings.local.json
