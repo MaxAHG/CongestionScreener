@@ -325,11 +325,18 @@ def page_screener():
     )
     st.plotly_chart(fig_bar, use_container_width=True)
 
+<<<<<<< HEAD
     # ── Scatter: in-territory LINE shadow price sum vs MCC intensity ──────────
     st.subheader("Congestion: In-Territory Line Constraints vs MCC Intensity")
     st.caption(
         "X = sum of shadow prices (Σ|SP|) for in-territory **line** (LN) constraints correlated "
         "with high-MCC hours. "
+=======
+    # ── Scatter: in-territory LINE hours vs MCC intensity ────────────────────
+    st.subheader("Congestion: In-Territory Line Constraints vs MCC Intensity")
+    st.caption(
+        "X = hours when an in-territory **line** (LN) was binding during high-MCC conditions. "
+>>>>>>> 77e400df3001d8f79ab2e536ef8982a4c11a5c09
         "Bubble size = number of distinct in-territory lines binding. "
         "Top-right utilities have both high congestion costs AND their own lines as bottlenecks."
     )
@@ -358,7 +365,11 @@ def page_screener():
         color = RTO_COLORS.get(rto_name, "#aaaaaa")
         fig_scatter.add_trace(go.Scatter(
             name=rto_name,
+<<<<<<< HEAD
             x=grp["corr_in_territory_ln_total_abs_sp"].tolist(),
+=======
+            x=grp["corr_in_territory_ln_hours"].tolist(),
+>>>>>>> 77e400df3001d8f79ab2e536ef8982a4c11a5c09
             y=grp["avg_mcc"].tolist(),
             mode="markers+text",
             text=grp["utility_ca"].tolist(),
@@ -373,6 +384,7 @@ def page_screener():
             customdata=list(zip(
                 grp["utility_name"],
                 grp["corr_in_territory_ln_constraints"].astype(int),
+<<<<<<< HEAD
                 grp["corr_in_territory_ln_hours"].astype(int),
                 grp["rto"],
             )),
@@ -382,12 +394,25 @@ def page_screener():
                 "Avg MCC: $%{y:.2f}/MWh<br>"
                 "In-Territory Lines: %{customdata[1]:,}<br>"
                 "Binding Hours: %{customdata[2]:,}<extra></extra>"
+=======
+                grp["rto"],
+            )),
+            hovertemplate=(
+                "<b>%{text}</b> — %{customdata[0]} [%{customdata[2]}]<br>"
+                "In-Territory Line Hours: %{x:,}<br>"
+                "Avg MCC: $%{y:.2f}/MWh<br>"
+                "In-Territory Lines: %{customdata[1]:,}<extra></extra>"
+>>>>>>> 77e400df3001d8f79ab2e536ef8982a4c11a5c09
             ),
             showlegend=True,
         ))
 
     fig_scatter.update_layout(
+<<<<<<< HEAD
         xaxis_title="In-Territory Line Constraints — Σ|Shadow Price| ($)",
+=======
+        xaxis_title="In-Territory Line Correlated Binding Hours",
+>>>>>>> 77e400df3001d8f79ab2e536ef8982a4c11a5c09
         yaxis_title="Avg MCC ($/MWh)",
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0),
         margin=dict(l=0, r=20, t=20, b=40),
@@ -409,7 +434,11 @@ def page_screener():
         "sum_positive_mcc":            "Σ Pos. MCC",
         "corr_in_territory_constraints": "In-Terr. Constraints",
         "corr_in_territory_hours":     "In-Terr. Hours",
+<<<<<<< HEAD
         "corr_in_territory_ln_total_abs_sp": "In-Terr. Line Σ|SP|",
+=======
+        "owned_total_abs_sp":          "Owned Σ|SP|",
+>>>>>>> 77e400df3001d8f79ab2e536ef8982a4c11a5c09
         "corr_total_hours":            "All Corr. Hours",
         "top_corr_constraint":         "Top Corr. Constraint",
     }
@@ -428,7 +457,11 @@ def page_screener():
             "Avg Pos. MCC":         st.column_config.NumberColumn(format="$%.2f"),
             "% Hrs > $5":           st.column_config.NumberColumn(format="%.1f%%"),
             "Σ Pos. MCC":           st.column_config.NumberColumn(format="$%.0f"),
+<<<<<<< HEAD
             "In-Terr. Line Σ|SP|":  st.column_config.NumberColumn(format="$%.0f"),
+=======
+            "Owned Σ|SP|":          st.column_config.NumberColumn(format="$%.0f"),
+>>>>>>> 77e400df3001d8f79ab2e536ef8982a4c11a5c09
             "In-Terr. Constraints": st.column_config.NumberColumn(format="%d"),
             "In-Terr. Hours":       st.column_config.NumberColumn(format="%d"),
             "All Corr. Hours":      st.column_config.NumberColumn(format="%d"),
