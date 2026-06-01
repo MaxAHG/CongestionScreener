@@ -120,9 +120,10 @@ CREATE TABLE IF NOT EXISTS screener (
     corr_max_single_constraint_hrs   BIGINT,
     corr_in_territory_constraints    BIGINT,
     corr_in_territory_hours          BIGINT,
-    corr_in_territory_ln_constraints BIGINT,
-    corr_in_territory_ln_hours       BIGINT,
-    top_corr_constraint              VARCHAR
+    corr_in_territory_ln_constraints  BIGINT,
+    corr_in_territory_ln_hours        BIGINT,
+    corr_in_territory_ln_total_abs_sp DOUBLE,
+    top_corr_constraint               VARCHAR
 );
 """
 
@@ -347,6 +348,11 @@ def build_screener(con: duckdb.DuckDBPyConnection, rto: str) -> None:
                      AND branch_type = 'LN'
                     THEN co_occurrence_hours ELSE 0 END), 0)
                                                                 AS corr_in_territory_ln_hours,
+                ROUND(COALESCE(SUM(CASE
+                    WHEN (from_ca = utility_ca OR to_ca = utility_ca)
+                     AND branch_type = 'LN'
+                    THEN total_abs_sp ELSE 0 END), 0), 0)
+                                                                AS corr_in_territory_ln_total_abs_sp,
                 ANY_VALUE(constraint_name) FILTER (WHERE rn = 1) AS top_corr_constraint
             FROM (
                 SELECT *,
@@ -383,8 +389,9 @@ def build_screener(con: duckdb.DuckDBPyConnection, rto: str) -> None:
             c.corr_max_single_constraint_hrs,
             COALESCE(c.corr_in_territory_constraints,     0)    AS corr_in_territory_constraints,
             COALESCE(c.corr_in_territory_hours,          0)    AS corr_in_territory_hours,
-            COALESCE(c.corr_in_territory_ln_constraints, 0)    AS corr_in_territory_ln_constraints,
-            COALESCE(c.corr_in_territory_ln_hours,       0)    AS corr_in_territory_ln_hours,
+            COALESCE(c.corr_in_territory_ln_constraints,       0) AS corr_in_territory_ln_constraints,
+            COALESCE(c.corr_in_territory_ln_hours,             0) AS corr_in_territory_ln_hours,
+            COALESCE(c.corr_in_territory_ln_total_abs_sp,      0) AS corr_in_territory_ln_total_abs_sp,
             c.top_corr_constraint
         FROM ca_reference r
         LEFT JOIN lmp_stats       l USING (utility_ca)

@@ -94,6 +94,7 @@ def load_screener(rtos: tuple[str, ...] | None = None) -> pd.DataFrame:
             corr_in_territory_hours,
             corr_in_territory_ln_constraints,
             corr_in_territory_ln_hours,
+            corr_in_territory_ln_total_abs_sp,
             top_corr_constraint
         FROM screener
         WHERE avg_mcc IS NOT NULL
@@ -324,10 +325,11 @@ def page_screener():
     )
     st.plotly_chart(fig_bar, use_container_width=True)
 
-    # ── Scatter: in-territory LINE hours vs MCC intensity ────────────────────
+    # ── Scatter: in-territory LINE shadow price sum vs MCC intensity ──────────
     st.subheader("Congestion: In-Territory Line Constraints vs MCC Intensity")
     st.caption(
-        "X = hours when an in-territory **line** (LN) was binding during high-MCC conditions. "
+        "X = sum of shadow prices (Σ|SP|) for in-territory **line** (LN) constraints correlated "
+        "with high-MCC hours. "
         "Bubble size = number of distinct in-territory lines binding. "
         "Top-right utilities have both high congestion costs AND their own lines as bottlenecks."
     )
@@ -356,7 +358,7 @@ def page_screener():
         color = RTO_COLORS.get(rto_name, "#aaaaaa")
         fig_scatter.add_trace(go.Scatter(
             name=rto_name,
-            x=grp["corr_in_territory_ln_hours"].tolist(),
+            x=grp["corr_in_territory_ln_total_abs_sp"].tolist(),
             y=grp["avg_mcc"].tolist(),
             mode="markers+text",
             text=grp["utility_ca"].tolist(),
@@ -371,19 +373,21 @@ def page_screener():
             customdata=list(zip(
                 grp["utility_name"],
                 grp["corr_in_territory_ln_constraints"].astype(int),
+                grp["corr_in_territory_ln_hours"].astype(int),
                 grp["rto"],
             )),
             hovertemplate=(
-                "<b>%{text}</b> — %{customdata[0]} [%{customdata[2]}]<br>"
-                "In-Territory Line Hours: %{x:,}<br>"
+                "<b>%{text}</b> — %{customdata[0]} [%{customdata[3]}]<br>"
+                "In-Territory Line Σ|SP|: $%{x:,.0f}<br>"
                 "Avg MCC: $%{y:.2f}/MWh<br>"
-                "In-Territory Lines: %{customdata[1]:,}<extra></extra>"
+                "In-Territory Lines: %{customdata[1]:,}<br>"
+                "Binding Hours: %{customdata[2]:,}<extra></extra>"
             ),
             showlegend=True,
         ))
 
     fig_scatter.update_layout(
-        xaxis_title="In-Territory Line Correlated Binding Hours",
+        xaxis_title="In-Territory Line Constraints — Σ|Shadow Price| ($)",
         yaxis_title="Avg MCC ($/MWh)",
         legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="left", x=0),
         margin=dict(l=0, r=20, t=20, b=40),
@@ -405,7 +409,7 @@ def page_screener():
         "sum_positive_mcc":            "Σ Pos. MCC",
         "corr_in_territory_constraints": "In-Terr. Constraints",
         "corr_in_territory_hours":     "In-Terr. Hours",
-        "owned_total_abs_sp":          "Owned Σ|SP|",
+        "corr_in_territory_ln_total_abs_sp": "In-Terr. Line Σ|SP|",
         "corr_total_hours":            "All Corr. Hours",
         "top_corr_constraint":         "Top Corr. Constraint",
     }
@@ -424,7 +428,7 @@ def page_screener():
             "Avg Pos. MCC":         st.column_config.NumberColumn(format="$%.2f"),
             "% Hrs > $5":           st.column_config.NumberColumn(format="%.1f%%"),
             "Σ Pos. MCC":           st.column_config.NumberColumn(format="$%.0f"),
-            "Owned Σ|SP|":          st.column_config.NumberColumn(format="$%.0f"),
+            "In-Terr. Line Σ|SP|":  st.column_config.NumberColumn(format="$%.0f"),
             "In-Terr. Constraints": st.column_config.NumberColumn(format="%d"),
             "In-Terr. Hours":       st.column_config.NumberColumn(format="%d"),
             "All Corr. Hours":      st.column_config.NumberColumn(format="%d"),
